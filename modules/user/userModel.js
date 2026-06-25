@@ -14,4 +14,15 @@ const User = sequelize.define('User',
     }
 );
 
+User.associate = (models) => {
+    User.hasMany(models.ItemPost, {
+        foreignKey: 'userId',
+        as: 'item'
+    });
+    User.hasMany(models.ItemMessage, {
+        foreignKey: 'senderId',
+        as: 'sentMessages'
+    });
+};
+
 module.exports = User;
