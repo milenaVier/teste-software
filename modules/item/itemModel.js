@@ -16,14 +16,5 @@ const Item = sequelize.define('Item',
         tableName: 'items'
     }
 );
-ItemPost.associate = (models) => {
-    ItemPost.belongsTo(models.User, {
-        foreignKey: 'userId',
-        as: 'user'
-    });
-    ItemPost.hasMani(models.ItemMessage, {
-        foreignKey: 'itemPostId',
-        as: 'messages'
-    })
-}
-return ItemPost;
+
+module.exports = Item;

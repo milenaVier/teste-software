@@ -13,14 +13,4 @@ const Messages = sequelize.define('Messages',
         tableName: 'messages'
     }
 );
-itemMessage.associate = (models) => {
-    itemMessage.belongsTo(models.itemPost, {
-        foreingKey: 'ItemPostId',
-        as: 'item'
-    });
-    itemMessage.belongsTo(models.User, {
-        foreingKey: 'senderId',
-        as: 'sender'
-    });
-    return itemMessage;
-};
+ module.exports = Messages;
