@@ -69,6 +69,8 @@ app.use(function(err, req, res, next) {
 
 app.use(errorHandler);
 
+require("./config/associations");
+
 sequelize.sync({ alter: true })
     .then(() => console.log('Banco de dados sincronizado!'))
     .catch(err => console.error('Erro ao sincronizar banco:', err));
