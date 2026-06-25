@@ -4,7 +4,7 @@ const sequelize = require ('../../config/database');
 const Item = sequelize.define('Item', 
     {
         id:             { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-        title:          {},
+        title:          { type: DataTypes.STRING},
         description:    {},
         type:           {},
         location:       {},
