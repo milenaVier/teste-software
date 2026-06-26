@@ -1,5 +1,5 @@
 const userService = require('./userService');
-const asyncHandler = require('../../middlewares/asyncHandler')
+const asyncHandler = require('../../middlewares/asyncHandler');
 
 exports.register = asyncHandler(async (req, res) => {
     const { username, email, password, confirmPassword, fullName } = req.body;

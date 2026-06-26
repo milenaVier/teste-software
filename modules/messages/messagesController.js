@@ -1,6 +1,7 @@
 const messagesService = require('./messagesService');
+const asyncHandler = require('../../middlewares/asyncHandler');
 
-exports.create = async (req, res) => {
+exports.create = asyncHandler (async (req, res) => {
     const { content } = req.body;
     const itemId = req.params.id;
     const senderId = req.session.userId;
@@ -17,4 +18,4 @@ exports.create = async (req, res) => {
     
     req.flash('success', 'Mensagem enviada!');
     res.redirect(`/items/${itemId}`);
-};
+});

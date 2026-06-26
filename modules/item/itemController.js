@@ -1,13 +1,14 @@
 const itemService = require('./itemService');
+const asyncHandler = require('../../middlewares/asyncHandler');
 
-exports.listarItens = async (req, res) => {
+exports.listarItens = asyncHandler (async (req, res) => {
     const { type } = req.query;
     const items = await itemService.getAllItem(type);
 
     res.render('item/index', { items });
-};
+});
 
-exports.criarItem = async (req, res) => {
+exports.criarItem = asyncHandler (async (req, res) => {
     console.log(req.body);
     const { title, description, type, location} = req.body;
     const userId = req.session.user?.id;
@@ -25,16 +26,16 @@ exports.criarItem = async (req, res) => {
     );
 
     res.redirect(`/items/${item.id}`);
-};
+});
 
-exports.show = async (req, res) => {
+exports.show = asyncHandler (async (req, res) => {
     const { id } = req.params;
     const item = await itemService.getItemById(id);
 
     res.render('item/show', { item, chatMessages: [] });
-};
+});
 
-exports.resolve = async (req, res) => {
+exports.resolve = asyncHandler (async (req, res) => {
     const { id } = req.params;
     const userId = req.session.user?.id;
 
@@ -42,4 +43,4 @@ exports.resolve = async (req, res) => {
     req.flash('success', 'Item resolvido!');
 
     res.redirect(`/items/${id}`);
-};
+});
