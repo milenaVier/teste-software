@@ -19,7 +19,7 @@ exports.login = asyncHandler(async (req, res) => {
     req.session.user = userData;
 
     req.flash("success", `Bem-vindo de volta, ${userData.username}!`);
-    res.redirect("/feed");
+    res.redirect("/items");
 });
 
 exports.logout = (req, res) => {

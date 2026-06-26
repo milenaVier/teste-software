@@ -21,7 +21,7 @@ exports.createItem = async(title, description, type, location, userId) => {
     return newItem;
 };
 
-exports.getAllItem = async() => {
+exports.getAllItem = async(type) => {
     const where = {};
 
     if (type) {
@@ -31,10 +31,8 @@ exports.getAllItem = async() => {
             throw new Error('Tipo inválido');
         }
         where.type = type;
-    }
-    const items = await Item.findAll({ where });
-    
-    return items;
+    }    
+    return await Item.findAll({ where });
 };
 
 exports.getItemById = async(id) => {

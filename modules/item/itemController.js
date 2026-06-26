@@ -4,12 +4,13 @@ exports.listarItens = async (req, res) => {
     const { type } = req.query;
     const items = await itemService.getAllItem(type);
 
-    res.render('views/item/index', { items });
+    res.render('item/index', { items });
 };
 
 exports.criarItem = async (req, res) => {
+    console.log(req.body);
     const { title, description, type, location} = req.body;
-    const userId = req.session.userId;
+    const userId = req.session.user?.id;
 
     if (!userId) {
         return res.redirect('/login');
@@ -23,22 +24,22 @@ exports.criarItem = async (req, res) => {
         userId
     );
 
-    res.redirect(`/item/${item.id}`);
+    res.redirect(`/items/${item.id}`);
 };
 
 exports.show = async (req, res) => {
     const { id } = req.params;
     const item = await itemService.getItemById(id);
 
-    res.render('views/item/show', { item });
+    res.render('item/show', { item, chatMessages: [] });
 };
 
 exports.resolve = async (req, res) => {
     const { id } = req.params;
-    const userId = req.session.userId;
+    const userId = req.session.user?.id;
 
     await itemService.resolvedItem(id, userId);
     req.flash('success', 'Item resolvido!');
 
-    res.redirect(`/item/${id}`);
+    res.redirect(`/items/${id}`);
 };

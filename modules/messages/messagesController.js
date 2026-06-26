@@ -16,5 +16,5 @@ exports.create = async (req, res) => {
     );
     
     req.flash('success', 'Mensagem enviada!');
-    res.redirect(`/item/${itemId}`);
+    res.redirect(`/items/${itemId}`);
 };
