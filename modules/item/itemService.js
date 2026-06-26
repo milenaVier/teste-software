@@ -1,5 +1,4 @@
 const Item = require('./itemModel');
-const { ItemPost } = require('./itemModel');
 
 exports.createItem = async(title, description, type, location, userId) => {
     if (!userId) {
@@ -9,8 +8,9 @@ exports.createItem = async(title, description, type, location, userId) => {
     if (!validTypes.includes(type)) {
         throw new Error('TIpo Inválido');
     }
-    const status = 'open';
-    const newItem = await ItemPost.create({
+    const status = 'Em aberto';
+
+    const newItem = await Item.create({
         title,
         description,
         type,
@@ -23,21 +23,22 @@ exports.createItem = async(title, description, type, location, userId) => {
 
 exports.getAllItem = async() => {
     const where = {};
+
     if (type) {
-        const validTypes = ['Achadao', 'Perdido'];
+        const validTypes = ['Achado', 'Perdido'];
 
         if (!validTypes.includes(type)) {
             throw new Error('Tipo inválido');
         }
         where.type = type;
     }
-    const items = await ItemPost.findAll({ where });
+    const items = await Item.findAll({ where });
     
     return items;
 };
 
 exports.getItemById = async(id) => {
-    const item = await ItemPost.findByPk(id);
+    const item = await Item.findByPk(id);
     if (!item) {
         throw new Error('Item não encontrado');
     }
@@ -45,7 +46,7 @@ exports.getItemById = async(id) => {
 };
 
 exports.resolvedItem = async(itemId, userId) => {
-    const item = await ItemPost.findByPk(itemId);
+    const item = await Item.findByPk(itemId);
     if (!item) {
         throw new Error('Item não encontradado');
     }
