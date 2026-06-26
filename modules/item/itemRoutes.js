@@ -7,9 +7,9 @@ const isAuthenticated = require('../../middlewares/auth');
 
 router.get("/items", itemController.listarItens);
 
-router.get('/items/new', isAuthenticated, (req, res => {
+router.get('/items/new', isAuthenticated, (req, res) => {
     res.render('views/item/new');
-}));
+});
 
 router.post("/items", isAuthenticated, itemController.criarItem);
 

@@ -19,7 +19,7 @@ exports.createMessage = async(content, userId, itemId) => {
     const message = await Messages.create({
         content,
         itemId,
-        senderId = userId
+        senderId: userId
     });
     return message;
 };
