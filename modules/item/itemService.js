@@ -4,7 +4,7 @@ exports.createItem = async(title, description, type, location, userId) => {
     if (!userId) {
         throw new Error('Usuário não autenticado');
     }
-    const validTypes = ['Achado', 'Perdido'];
+    const validTypes = ['achado', 'Perdido'];
     if (!validTypes.includes(type)) {
         throw new Error('TIpo Inválido');
     }
@@ -25,7 +25,7 @@ exports.getAllItem = async(type) => {
     const where = {};
 
     if (type) {
-        const validTypes = ['Achado', 'Perdido'];
+        const validTypes = ['achado', 'Perdido'];
 
         if (!validTypes.includes(type)) {
             throw new Error('Tipo inválido');
@@ -43,7 +43,7 @@ exports.getItemById = async(id) => {
     return item;
 };
 
-exports.resolvedItem = async(itemId, userId) => {
+exports.resolve = async(itemId, userId) => {
     const item = await Item.findByPk(itemId);
     if (!item) {
         throw new Error('Item não encontradado');
@@ -51,7 +51,7 @@ exports.resolvedItem = async(itemId, userId) => {
     if (item.userId !== userId) {
         throw new Error('Não autorizado');
     }
-    item.status = 'Resolvido';
+    item.status = 'resolvido';
     await item.save();
 
     return item;
