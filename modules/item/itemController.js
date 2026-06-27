@@ -39,7 +39,7 @@ exports.resolve = asyncHandler (async (req, res) => {
     const { id } = req.params;
     const userId = req.session.user?.id;
 
-    await itemService.resolve(id, userId);
+    await itemService.resolvedItem(id, userId);
     req.flash('success', 'Item resolvido!');
 
     res.redirect(`/items/${id}`);
