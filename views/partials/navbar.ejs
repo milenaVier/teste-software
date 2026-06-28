@@ -1,0 +1,54 @@
+<nav class="navbar navbar-expand-lg navbar-light navbar-catolica sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+            <img src="/images/logo-catolica.png" alt="Católica SC Logo" class="d-inline-block align-text-top">
+            <span class="fw-bold tracking-tight text-dark ms-2">Achados & Perdidos</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1 ms-lg-3">
+                <li class="nav-item">
+                    <a class="nav-link px-3 rounded-pill" href="/"><i class="bi bi-house-door me-1"></i>Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 rounded-pill" href="/items"><i class="bi bi-list-task me-1"></i>Ver Itens</a>
+                </li>
+                <% if (user) { %>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 rounded-pill text-catolica fw-semibold" href="/items/new" style="color: var(--primary-color);"><i class="bi bi-plus-circle me-1"></i>Registrar Item</a>
+                    </li>
+                <% } %>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                <% if (user) { %>
+                    <div class="dropdown">
+                        <button class="btn btn-user-profile dropdown-toggle d-flex align-items-center gap-2" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="avatar-circle">
+                                <%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %>
+                            </div>
+                            <span class="d-none d-sm-inline text-dark fw-semibold"><%= user.name %></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2" aria-labelledby="userDropdown">
+                            <li class="px-3 py-2 border-bottom border-light">
+                                <span class="d-block text-muted small">Logado como:</span>
+                                <span class="fw-bold text-dark text-truncate d-block"><%= user.email %></span>
+                            </li>
+                            <li>
+                                <form action="/logout" method="POST" class="m-0">
+                                    <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center gap-2">
+                                        <i class="bi bi-box-arrow-right"></i> Sair do Sistema
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                <% } else { %>
+                    <a href="/login" class="btn btn-link text-decoration-none text-secondary px-3 fw-semibold hover-link">Entrar</a>
+                    <a href="/register" class="btn btn-catolica px-4 rounded-pill shadow-sm">Criar Conta</a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</nav>

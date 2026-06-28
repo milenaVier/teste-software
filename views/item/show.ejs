@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <%- include("../partials/head") %>
+    <style>
+        /* Chat styles (escopo desta página) */
+        .chat-window {
+            height: 420px;
+            overflow-y: auto;
+            background-color: var(--bg-light);
+            border-radius: 14px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            scroll-behavior: smooth;
+        }
+        .chat-window::-webkit-scrollbar { width: 8px; }
+        .chat-window::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 8px; }
+
+        .chat-msg { max-width: 78%; display: flex; flex-direction: column; }
+        .chat-msg.mine { align-self: flex-end; align-items: flex-end; }
+        .chat-msg.theirs { align-self: flex-start; align-items: flex-start; }
+
+        .chat-bubble {
+            padding: 0.6rem 0.9rem;
+            border-radius: 16px;
+            font-size: 0.92rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .chat-msg.mine .chat-bubble {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-msg.theirs .chat-bubble {
+            background-color: #fff;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+        .chat-meta { font-size: 0.72rem; color: var(--text-secondary); margin: 0 0.25rem; }
+        .chat-empty { margin: auto; text-align: center; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <%- include("../partials/navbar") %>
+    <%- include("../partials/messages") %>
+
+    <main class="container my-5">
+        <!-- Return Button -->
+        <div class="mb-3">
+            <a href="/items" class="btn btn-link text-decoration-none text-secondary p-0 hover-link fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Voltar para o Mural
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- Coluna de detalhes do item -->
+            <div class="col-lg-5">
+                <div class="card catolica-card border-0 shadow-sm h-100 d-flex flex-column">
+                    <!-- Accent bar por tipo -->
+                    <div class="w-100" style="height: 6px; background-color: <%= item.type === 'perdido' ? '#f59e0b' : '#10b981' %>;"></div>
+
+                    <div class="card-body p-4 p-sm-5 d-flex flex-column">
+                        <!-- Badges -->
+                        <div class="d-flex gap-2 mb-3 flex-wrap">
+                            <span class="badge text-white px-3 py-2 rounded-pill fw-semibold" style="background-color: <%= item.type === 'perdido' ? '#f59e0b' : '#10b981' %>; font-size: 0.78rem;">
+                                <i class="bi <%= item.type === 'perdido' ? 'bi-search' : 'bi-box-seam' %> me-1"></i>
+                                <%= item.type === 'perdido' ? 'Perdido' : 'Encontrado' %>
+                            </span>
+                            <% if (item.status === 'resolvido') { %>
+                                <span class="badge bg-secondary text-white px-3 py-2 rounded-pill fw-semibold" style="font-size: 0.78rem;">
+                                    <i class="bi bi-check-circle me-1"></i> Resolvido
+                                </span>
+                            <% } else { %>
+                                <span class="badge px-3 py-2 rounded-pill fw-semibold" style="background-color: var(--primary-light); color: var(--primary-color); font-size: 0.78rem;">
+                                    <i class="bi bi-broadcast me-1"></i> Ativo
+                                </span>
+                            <% } %>
+                        </div>
+
+                        <h1 class="fw-bold text-dark mb-3" style="font-size: 1.6rem;"><%= item.title %></h1>
+
+                        <p class="text-secondary mb-4" style="white-space: pre-wrap;"><%= item.description %></p>
+
+                        <!-- Meta info -->
+                        <div class="border-top border-light pt-3 mb-2">
+                            <div class="d-flex align-items-center text-secondary small mb-2">
+                                <i class="bi bi-geo-alt me-2 text-danger"></i>
+                                <span><strong>Local:</strong> <%= item.location %></span>
+                            </div>
+                            <div class="d-flex align-items-center text-secondary small mb-2">
+                                <i class="bi bi-calendar-event me-2 text-primary"></i>
+                                <span><strong>Registrado em:</strong> <%= item.createdAt ? new Date(item.createdAt).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR') %></span>
+                            </div>
+                            <div class="d-flex align-items-center text-secondary small">
+                                <i class="bi bi-person-circle me-2" style="color: var(--primary-color);"></i>
+                                <span><strong>Publicado por:</strong> <%= item.user ? item.user.name : 'Usuário' %></span>
+                            </div>
+                        </div>
+
+                        <!-- Ação do dono: marcar como resolvido -->
+                        <% if (user && user.id === item.userId && item.status !== 'resolvido') { %>
+                            <form action="/items/<%= item.id %>/resolve" method="POST" class="mt-auto pt-4">
+                                <button type="submit" class="btn btn-catolica w-100 py-2 rounded-pill">
+                                    <i class="bi bi-check2-circle me-2"></i> Marcar como Resolvido
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna do chat -->
+            <div class="col-lg-7">
+                <div id="chat" class="card catolica-card border-0 shadow-sm h-100 d-flex flex-column">
+                    <div class="catolica-card-header-bar"></div>
+
+                    <div class="card-body p-4 d-flex flex-column">
+                        <!-- Cabeçalho do chat -->
+                        <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-light">
+                            <div class="icon-box mb-0" style="width:44px;height:44px;">
+                                <i class="bi bi-chat-dots-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0">Conversa sobre este item</h5>
+                                <p class="text-secondary small mb-0">
+                                    Entre em contato com <%= item.user ? item.user.name : 'quem registrou' %> para combinar a devolução.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Janela de mensagens -->
+                        <div id="chatWindow" class="chat-window flex-grow-1 mb-3">
+                            <% if (!chatMessages || chatMessages.length === 0) { %>
+                                <div id="chatEmpty" class="chat-empty">
+                                    <i class="bi bi-chat-square-text fs-1 d-block mb-2" style="color: var(--border-color);"></i>
+                                    Nenhuma mensagem ainda.<br>Seja o primeiro a iniciar a conversa!
+                                </div>
+                            <% } else { %>
+                                <% chatMessages.forEach(function(msg) { %>
+                                    <% var mine = user && msg.userId === user.id; %>
+                                    <div class="chat-msg <%= mine ? 'mine' : 'theirs' %>">
+                                        <div class="chat-bubble"><%= msg.content %></div>
+                                        <span class="chat-meta">
+                                            <%= mine ? 'Você' : (msg.sender ? msg.sender.name : 'Usuário') %>
+                                            · <%= new Date(msg.createdAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) %>
+                                        </span>
+                                    </div>
+                                <% }); %>
+                            <% } %>
+                        </div>
+
+                        <!-- Formulário de envio -->
+                        <% if (user) { %>
+                            <form action="/items/<%= item.id %>/messages" method="POST" class="mt-auto">
+                                <div class="input-group">
+                                    <input type="text" name="content" class="form-control bg-light border-light rounded-start-pill px-3"
+                                           placeholder="Digite sua mensagem..." autocomplete="off" required maxlength="1000">
+                                    <button type="submit" class="btn btn-catolica rounded-end-pill px-4">
+                                        <i class="bi bi-send-fill"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        <% } else { %>
+                            <div class="mt-auto text-center bg-light rounded-3 p-3 border border-light">
+                                <p class="text-secondary small mb-2">Você precisa estar logado para enviar mensagens sobre este item.</p>
+                                <a href="/login" class="btn btn-outline-catolica rounded-pill px-4 py-2">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i> Entrar para conversar
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include("../partials/footer") %>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chat: rolagem automática + atualização em tempo real (polling) -->
+    <script>
+        (function () {
+            const itemId = "<%= item.id %>";
+            const isLogged = <%= user ? 'true' : 'false' %>;
+            const chatWindow = document.getElementById('chatWindow');
+
+            function scrollToBottom() {
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function formatTime(iso) {
+                const d = new Date(iso);
+                return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+            }
+
+            function renderMessages(messages) {
+                if (!messages.length) return;
+                chatWindow.innerHTML = messages.map(function (m) {
+                    const side = m.mine ? 'mine' : 'theirs';
+                    const author = m.mine ? 'Você' : escapeHtml(m.senderName);
+                    return '<div class="chat-msg ' + side + '">' +
+                                '<div class="chat-bubble">' + escapeHtml(m.content) + '</div>' +
+                                '<span class="chat-meta">' + author + ' · ' + formatTime(m.createdAt) + '</span>' +
+                           '</div>';
+                }).join('');
+            }
+
+            let lastCount = chatWindow.querySelectorAll('.chat-msg').length;
+
+            scrollToBottom();
+            // Atualiza a conversa a cada 4s (deixa o chat "vivo" sem recarregar a página)
+            setInterval(refresh, 4000);
+        })();
+    </script>
+</body>
+</html>
